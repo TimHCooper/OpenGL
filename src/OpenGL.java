@@ -10,7 +10,11 @@ import com.jogamp.opengl.util.FPSAnimator;
 
 public class OpenGL implements GLEventListener {
 	
-	double angRot = 0.0;
+	double transX = 0.0;
+	double transY = 0.0;
+	
+	int momY = 1;
+	int momX = 1;
 
 	public static void main(String[] args) 
 	{
@@ -37,22 +41,35 @@ public class OpenGL implements GLEventListener {
 	public void display(GLAutoDrawable drawable) 
 	{
 		GL2 gl = drawable.getGL().getGL2();
+		gl.glColor3d(1.0, 0, 0);
+		
+		double width = 0.1;
+		
 		gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT);
 		
 		gl.glLoadIdentity();
 		
-		gl.glRotated(angRot, 0.0, 0.0, 1.0);
+		gl.glTranslated(transX, transY, 1.0);
 		
 		gl.glBegin(GL2.GL_QUADS);
-		gl.glVertex3d(-0.5, 0.5, 0);
-		gl.glVertex3d(-0.5, -0.5, 0);
-		gl.glVertex3d(0.5, -0.5, 0);
-		gl.glVertex3d(0.5, 0.5, 0);
+		
+		gl.glColor3d(1.0, 0, 0);
+		gl.glVertex3d(-width, width, 0);
+		gl.glVertex3d(-width, -width, 0);
+		gl.glVertex3d(width, -width, 0);
+		gl.glVertex3d(width, width, 0);
 		
 		gl.glEnd();
 		gl.glFlush();
 		
-		angRot += 2.0;
+		transX += (0.005 * momX);
+		transY += (0.02 * momY);
+		
+		if(transX >= 1 - width || transX <= -1 + width)
+			momX *= -1;
+		
+		if(transY >= 1 - width || transY <= -1 + width)
+			momY *= -1;
 	}
 
 	@Override
@@ -65,8 +82,14 @@ public class OpenGL implements GLEventListener {
 	@Override
 	public void init(GLAutoDrawable drawable) 
 	{
+		final GL2 gl = drawable.getGL().getGL2();
 		
-		
+	      gl.glShadeModel( GL2.GL_SMOOTH );
+	      gl.glClearColor( 0f, 0f, 0f, 0f );
+	      gl.glClearDepth( 1.0f );
+	      gl.glEnable( GL2.GL_DEPTH_TEST );
+	      gl.glDepthFunc( GL2.GL_LEQUAL );
+	      gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST );
 	}
 
 	@Override
